@@ -1,0 +1,66 @@
+## Standard .gitignore for C# projects
+
+## .NET build artifacts
+bin/
+obj/
+out/
+*.user
+*.rsuser
+*.suo
+*.cache
+*.db
+*.mdb
+
+## Visual Studio / Rider / VS Code
+.vscode/
+.idea/
+*.csproj.user
+*.vs/
+*.ncrunchsolution
+*.ncrunchproject
+
+## Logs
+*.log
+logs/
+LogFiles/
+
+## Environment / Secrets
+.env
+.env.*
+secrets.json
+appsettings.json
+appsettings.Local.json
+appsettings.Development.json
+
+## RSA Keys (IMPORTANT)
+private.key
+public.key
+
+## Docker
+docker-compose.override.yml
+docker-data/
+*.pid
+
+## OS junk
+.DS_Store
+Thumbs.db
+
+## NuGet
+*.nupkg
+packages/
+.nuget/
+
+## Publish output
+publish/
+artifacts/
+
+## SQL Server local DB
+*.mdf
+*.ldf
+
+## Rider / JetBrains
+*.DotSettings.user
+
+## Temporary files
+*.tmp
+*.temp
