@@ -13,12 +13,21 @@ public class UsersController : ControllerBase
     private readonly UserRepository _userRepo;
     private readonly RoleRepository _roleRepo;
     private readonly AuthService _authService;
+    private readonly RbacQueryService _rbacService;
+    private readonly JwtIssuer _jwtIssuer;
 
-    public UsersController(UserRepository userRepo, RoleRepository roleRepo, AuthService authService)
+    public UsersController(
+        UserRepository userRepo, 
+        RoleRepository roleRepo, 
+        AuthService authService,
+        RbacQueryService rbacService,
+        JwtIssuer jwtIssuer)
     {
         _userRepo = userRepo;
         _roleRepo = roleRepo;
         _authService = authService;
+        _rbacService = rbacService;
+        _jwtIssuer = jwtIssuer;
     }
 
     // Expects 403: Forbidden as admin account is created without role

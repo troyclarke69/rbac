@@ -35,6 +35,18 @@ builder.Services.AddSingleton<JwtIssuer>();
 // Controllers
 builder.Services.AddControllers();
 
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowUI", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+
 // ------------------------------------------------------------
 // JWT Authentication (RS256)
 // ------------------------------------------------------------
@@ -87,6 +99,10 @@ var app = builder.Build();
 // Middleware Pipeline
 // ------------------------------------------------------------
 app.UseRouting();
+
+app.UseCors("AllowUI");
+
+app.UseAuthorization();
 
 app.UseAuthentication();
 

@@ -13,6 +13,20 @@ public class RbacQueryRepository
         _connectionFactory = connectionFactory;
     }
 
+    public async Task AssignRoleAsync(Guid userId, string roleName)
+    {
+        using var conn = _connectionFactory.CreateConnection();
+
+        var roleId = await conn.ExecuteScalarAsync<Guid>(
+            "SELECT Id FROM dbo.Roles WHERE Name = @name",
+            new { name = roleName });
+
+        await conn.ExecuteAsync(
+            @"INSERT INTO dbo.UserRoles (UserId, RoleId)
+              VALUES (@userId, @roleId)",
+            new { userId, roleId });
+    }
+
     public async Task<List<string>> GetUserRolesAsync(Guid userId)
     {
         using var conn = _connectionFactory.CreateConnection();

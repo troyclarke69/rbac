@@ -1,12 +1,14 @@
 # **RBAC Identity Service (Auth0‑Style)**  
 
 ![.NET](https://img.shields.io/badge/.NET-8.0-blueviolet)
-![License](https://img.shields.io/badge/License-MIT-green)
-![Build](https://img.shields.io/badge/Build-Passing-success)
+![Language](https://img.shields.io/badge/Language-C%23-239120)
+![Auth](https://img.shields.io/badge/Auth-JWT%20RS256-yellow)
+![Security](https://img.shields.io/badge/Security-RBAC-critical)
+![Database](https://img.shields.io/badge/SQL%20Server-2022-blue)
 ![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows-lightgrey)
-![Database](https://img.shields.io/badge/SQL-Server%202022-blue)
-
-![CI](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/ci.yml/badge.svg)
+![License](https://img.shields.io/badge/License-MIT-green)
+![CI](https://github.com/troyclarke69/rbac/actions/workflows/ci.yml/badge.svg)
+![Coverage](https://img.shields.io/badge/Coverage-80%25-brightgreen)
 
 A standalone, production‑ready identity service implementing:
 
@@ -269,7 +271,7 @@ docker run -it --rm \
 ### **Run Bootstrap & Seed Scripts**
 
 ```bash
-sqlcmd -S localhost,1433 -U sa -P Swed9999! -i Database/auth-bootstrap.sql
+sqlcmd -S localhost,1433 -U sa -P Swed9999! -i Database/rbac_bootstrap.sql
 sqlcmd -S localhost,1433 -U sa -P Swed9999! -d AuthDemo -i Database/seed-data.sql
 ```
 
@@ -292,9 +294,6 @@ Assumptions:
 
 - API running at `http://localhost:5000`  
 - SQL Server at `localhost,1433`  
-- You’ve created:
-  - `admin@example.com` (no roles)
-  - `superadmin@example.com` (manager role)
 
 Use the **superadmin token** for privileged tests.
 
