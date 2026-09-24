@@ -21,7 +21,6 @@ builder.Services.AddSingleton<SqlConnectionFactory>();
 // Repositories
 builder.Services.AddSingleton<UserRepository>();
 builder.Services.AddSingleton<RoleRepository>();
-builder.Services.AddSingleton<PermissionRepository>();
 builder.Services.AddSingleton<RbacQueryRepository>();
 
 // Utilities
@@ -64,7 +63,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddJwtBearer(options =>
+.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
 {
     options.RequireHttpsMetadata = false; // dev-friendly
     options.SaveToken = true;
@@ -95,21 +94,26 @@ builder.Services.AddAuthorization();
 // ------------------------------------------------------------
 var app = builder.Build();
 
+// 
+app.Use(async (context, next) =>
+{
+    Console.WriteLine("Pipeline: " + context.Request.Path);
+    Console.WriteLine("Auth: " + context.User.Identity?.IsAuthenticated);
+    await next();
+});
+
 // ------------------------------------------------------------
 // Middleware Pipeline
 // ------------------------------------------------------------
 app.UseRouting();
-
 app.UseCors("AllowUI");
 
-app.UseAuthorization();
 
 app.UseAuthentication();
-
-// Custom RBAC permission middleware
-app.UseMiddleware<PermissionAuthorizationMiddleware>();
-
 app.UseAuthorization();
+
+// Custom RBAC permission middleware (runs AFTER auth)
+app.UseMiddleware<PermissionAuthorizationMiddleware>();
 
 app.MapControllers();
 

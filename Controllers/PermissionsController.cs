@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Rbac.Middleware;
 using Rbac.Repositories;
 using Rbac.Models;
+using Rbac.Services;
 
 namespace Rbac.Controllers;
 
@@ -9,37 +10,72 @@ namespace Rbac.Controllers;
 [Route("permissions")]
 public class PermissionsController : ControllerBase
 {
-    private readonly PermissionRepository _permRepo;
+    private readonly RbacQueryService _service;
 
-    public PermissionsController(PermissionRepository permRepo)
+    public PermissionsController(RbacQueryService service)
     {
-        _permRepo = permRepo;
+        _service = service;
     }
 
+    // -------------------------------------------------------------
+    // GET /permissions
+    // -------------------------------------------------------------
     [HttpGet]
     [RequirePermission("read:permissions")]
     public async Task<IActionResult> GetPermissions()
+        => Ok(await _service.GetAllPermissionsAsync());
+
+    // -------------------------------------------------------------
+    // POST /permissions/create
+    // -------------------------------------------------------------
+    [HttpPost("create")]
+    [RequirePermission("create:permissions","admin")]
+    public async Task<IActionResult> CreatePermission([FromBody] CreatePermissionRequest req)
     {
-        return Ok(await _permRepo.GetAllAsync());
+        await _service.CreatePermissionAsync(req.Name, req.Description);
+        return Ok(new { status = "permission created" });
     }
 
-    public class CreatePermissionRequest
+    // -------------------------------------------------------------
+    // POST /permissions/update
+    // -------------------------------------------------------------
+    [HttpPost("update")]
+    [RequirePermission("update:permissions")]
+    public async Task<IActionResult> UpdatePermission([FromBody] UpdatePermissionRequest req)
     {
-        public string Name { get; set; } = string.Empty;
-        public string? Description { get; set; }
+        await _service.UpdatePermissionAsync(req.PermissionId, req.Name, req.Description);
+        return Ok(new { status = "permission updated" });
     }
 
-    [HttpPost]
-    [RequirePermission("write:roles")] // same permission Auth0 uses
-    public async Task<IActionResult> CreatePermission([FromBody] CreatePermissionRequest request)
+    // -------------------------------------------------------------
+    // POST /permissions/delete
+    // -------------------------------------------------------------
+    [HttpPost("delete")]
+    [RequirePermission("delete:permissions")]
+    public async Task<IActionResult> DeletePermission([FromBody] DeletePermissionRequest req)
     {
-        var perm = new Permission
-        {
-            Name = request.Name,
-            Description = request.Description
-        };
-
-        var id = await _permRepo.CreateAsync(perm);
-        return Ok(new { id });
+        await _service.DeletePermissionAsync(req.PermissionId);
+        return Ok(new { status = "permission deleted" });
     }
+}
+
+// -------------------------------------------------------------
+// DTOs
+// -------------------------------------------------------------
+public class CreatePermissionRequest
+{
+    public string Name { get; set; } = string.Empty;
+    public string? Description { get; set; }
+}
+
+public class UpdatePermissionRequest
+{
+    public Guid PermissionId { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? Description { get; set; }
+}
+
+public class DeletePermissionRequest
+{
+    public Guid PermissionId { get; set; }
 }

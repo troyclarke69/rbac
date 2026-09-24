@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using Rbac.Middleware;
 using Rbac.Repositories;
 using Rbac.Services;
@@ -28,6 +30,29 @@ public class UsersController : ControllerBase
         _authService = authService;
         _rbacService = rbacService;
         _jwtIssuer = jwtIssuer;
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> Me()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        Console.WriteLine("IsAuthenticated: " + User.Identity?.IsAuthenticated);
+        Console.WriteLine("Claims: " + string.Join(", ", User.Claims.Select(c => $"{c.Type}={c.Value}")));
+
+        if (!Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
+
+        var roles = await _rbacService.GetUserRolesAsync(userId);
+        var permissions = await _rbacService.GetUserPermissionsAsync(userId);
+
+        return Ok(new {
+            userId,
+            email = User.Identity?.Name,
+            roles,
+            permissions
+        });
     }
 
     // Expects 403: Forbidden as admin account is created without role
@@ -83,4 +108,5 @@ public class UsersController : ControllerBase
         var id = await _authService.RegisterUserAsync(request.Email, request.Password);
         return Ok(new { id });
     }
+    
 }

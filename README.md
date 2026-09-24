@@ -273,16 +273,23 @@ docker run -it --rm \
 ```bash
 sqlcmd -S localhost,1433 -U sa -P Swed9999! -i Database/rbac_bootstrap.sql
 sqlcmd -S localhost,1433 -U sa -P Swed9999! -d AuthDemo -i Database/seed-data.sql
+
+NOTE: This will assign additional roles/perms AFTER the superadmin user is created via API below.
+sqlcmd -S localhost,1433 -U sa -P Swed9999! -d AuthDemo -i Database/superadmin.sql
 ```
 
 ---
 
-### **Validation Commands**
+### **Validation Commands (examples)**
 
 ```bash
 sqlcmd -S localhost,1433 -U sa -P Swed9999! -d AuthDemo -q "SELECT name FROM sys.databases;"
 sqlcmd -S localhost,1433 -U sa -P Swed9999! -d AuthDemo -q "SELECT name FROM sys.tables;"
 sqlcmd -S localhost,1433 -U sa -P Swed9999! -d AuthDemo -q "SELECT Email, PasswordHash FROM dbo.Users;"
+sqlcmd -S localhost,1433 -U sa -P Swed9999! -d AuthDemo -q "SELECT Name FROM dbo.Permissions;"
+sqlcmd -S localhost,1433 -U sa -P Swed9999! -d AuthDemo -q "INSERT INTO dbo.Permissions (Id, Name, Description)
+VALUES (NEWID(), 'read:permissions', 'Allows viewing the permissions list');"
+
 sqlcmd -S localhost,1433 -U sa -P Swed9999! -d AuthDemo -q "EXEC sp_help 'Users';"
 ```
 
@@ -369,6 +376,9 @@ Creates:
 - Returns `{ id, token }`
 
 This user can access all protected endpoints.
+
+## Important - superadmin requires additional role/perms setup - run this:
+sqlcmd -S localhost,1433 -U sa -P Swed9999! -d AuthDemo -i Database/superadmin.sql
 
 ---
 
